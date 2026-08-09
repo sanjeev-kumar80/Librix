@@ -51,6 +51,10 @@ public class IssueRecord {
     return fine;
   }
 
+  public void setDueDate(LocalDate dueDate) {
+    this.dueDate = dueDate;
+  }
+
   public void setReturnDate(LocalDate returnDate) {
     this.returnDate = returnDate;
   }

@@ -161,6 +161,27 @@ public class LibraryService {
     System.out.println("Fine: ₹" + fine);
   }
 
+  public void makeBookOverdue(int recordId, int daysLate) {
+
+    for (IssueRecord record : issueRecords) {
+
+      if (record.getRecordId() == recordId) {
+
+        LocalDate oldDueDate = LocalDate.now().minusDays(daysLate);
+
+        record.setDueDate(oldDueDate);
+
+        System.out.println(
+            "Book due date changed for testing: "
+                + oldDueDate);
+
+        return;
+      }
+    }
+
+    System.out.println("Issue record not found!");
+  }
+
   // Show issued books
   public void showIssuedBooks() {
 

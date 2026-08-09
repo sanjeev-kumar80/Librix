@@ -48,21 +48,9 @@ public class Main {
 
     library.issueBook(1, 101, 1);
 
-    System.out.println("\n--- ISSUED BOOKS ---");
+    System.out.println("\n--- MAKE BOOK OVERDUE ---");
 
-    library.showIssuedBooks();
-
-    System.out.println("\n--- BOOKS AFTER ISSUE ---");
-
-    library.showAllBooks();
-
-    System.out.println("\n--- ISSUE BOOK ---");
-
-    library.issueBook(1, 101, 1);
-
-    System.out.println("\n--- ISSUED BOOKS ---");
-
-    library.showIssuedBooks();
+    library.makeBookOverdue(1, 5);
 
     System.out.println("\n--- RETURN BOOK ---");
 
@@ -71,5 +59,22 @@ public class Main {
     System.out.println("\n--- BOOKS AFTER RETURN ---");
 
     library.showAllBooks();
+
+    System.out.println("\n--- TEACHER TEST ---");
+
+    library.issueBook(2, 102, 2);
+
+    library.makeBookOverdue(2, 5);
+
+    library.returnBook(2);
+
+    System.out.println("\n--- SPECIAL MEMBER TEST ---");
+
+    library.issueBook(3, 101, 3);
+
+    library.makeBookOverdue(3, 5);
+
+    library.returnBook(3);
+
   }
 }
