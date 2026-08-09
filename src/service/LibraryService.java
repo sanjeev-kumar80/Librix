@@ -170,6 +170,10 @@ public class LibraryService {
     System.out.println("Fine: ₹" + fine);
   }
 
+  public List<Book> getBooks() {
+    return books;
+  }
+
   // Make Book Overdue - Testing Only
   public void makeBookOverdue(
       int recordId,

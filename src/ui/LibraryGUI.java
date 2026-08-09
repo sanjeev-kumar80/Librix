@@ -1,14 +1,19 @@
 package ui;
 
+import exception.BookNotFoundException;
 import model.Book;
 import service.LibraryService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class LibraryGUI extends JFrame {
 
   private LibraryService library;
+
+  private DefaultTableModel tableModel;
+  private JTable table;
 
   public LibraryGUI(LibraryService library) {
 
@@ -24,14 +29,13 @@ public class LibraryGUI extends JFrame {
     setLocationRelativeTo(null);
 
     createUI();
+
+    loadBooks();
   }
 
   private void createUI() {
 
-    // Main panel
-    JPanel mainPanel = new JPanel();
-
-    mainPanel.setLayout(
+    JPanel mainPanel = new JPanel(
         new BorderLayout(20, 20));
 
     mainPanel.setBorder(
@@ -83,14 +87,14 @@ public class LibraryGUI extends JFrame {
 
     JButton searchButton = new JButton("Search Book");
 
-    searchPanel.add(
-        searchField);
+    JButton showAllButton = new JButton("Show All");
 
-    searchPanel.add(
-        searchButton);
+    searchPanel.add(searchField);
+    searchPanel.add(searchButton);
+    searchPanel.add(showAllButton);
 
     // =========================
-    // BOOK TABLE
+    // TABLE
     // =========================
 
     String[] columns = {
@@ -101,32 +105,13 @@ public class LibraryGUI extends JFrame {
         "Quantity"
     };
 
-    Object[][] data = {
-        {
-            101,
-            "Clean Code",
-            "Robert Martin",
-            "Programming",
-            3
-        },
-        {
-            102,
-            "Effective Java",
-            "Joshua Bloch",
-            "Programming",
-            2
-        }
-    };
+    tableModel = new DefaultTableModel(
+        columns,
+        0);
 
-    JTable table = new JTable(
-        data,
-        columns);
+    table = new JTable(tableModel);
 
     JScrollPane scrollPane = new JScrollPane(table);
-
-    // =========================
-    // CENTER
-    // =========================
 
     JPanel centerPanel = new JPanel(
         new BorderLayout(10, 10));
@@ -158,17 +143,10 @@ public class LibraryGUI extends JFrame {
 
     JButton membersButton = new JButton("Members");
 
-    buttonPanel.add(
-        addBookButton);
-
-    buttonPanel.add(
-        issueButton);
-
-    buttonPanel.add(
-        returnButton);
-
-    buttonPanel.add(
-        membersButton);
+    buttonPanel.add(addBookButton);
+    buttonPanel.add(issueButton);
+    buttonPanel.add(returnButton);
+    buttonPanel.add(membersButton);
 
     mainPanel.add(
         buttonPanel,
@@ -187,32 +165,156 @@ public class LibraryGUI extends JFrame {
 
         Book book = library.searchBook(id);
 
+        tableModel.setRowCount(0);
+
+        tableModel.addRow(
+            new Object[] {
+                book.getBookId(),
+                book.getTitle(),
+                book.getAuthor(),
+                book.getCategory(),
+                book.getQuantity()
+            });
+
+      } catch (NumberFormatException ex) {
+
         JOptionPane.showMessageDialog(
             this,
-            "Book Found!\n\n"
-                + "Title: "
-                + book.getTitle()
-                + "\nAuthor: "
-                + book.getAuthor()
-                + "\nCategory: "
-                + book.getCategory()
-                + "\nQuantity: "
-                + book.getQuantity());
+            "Please enter a valid Book ID.",
+            "Invalid Input",
+            JOptionPane.ERROR_MESSAGE);
 
-      } catch (Exception ex) {
+      } catch (BookNotFoundException ex) {
 
         JOptionPane.showMessageDialog(
             this,
             ex.getMessage(),
-            "Error",
+            "Book Not Found",
             JOptionPane.ERROR_MESSAGE);
       }
     });
 
     // =========================
-    // ADD TO FRAME
+    // SHOW ALL
     // =========================
 
+    showAllButton.addActionListener(e -> {
+
+      loadBooks();
+    });
+
+    // =========================
+    // ADD BOOK
+    // =========================
+
+    addBookButton.addActionListener(e -> {
+
+      showAddBookDialog();
+    });
+
     add(mainPanel);
+  }
+
+  // =========================
+  // LOAD BOOKS
+  // =========================
+
+  private void loadBooks() {
+
+    tableModel.setRowCount(0);
+
+    for (Book book : library.getBooks()) {
+
+      tableModel.addRow(
+          new Object[] {
+              book.getBookId(),
+              book.getTitle(),
+              book.getAuthor(),
+              book.getCategory(),
+              book.getQuantity()
+          });
+    }
+  }
+
+  // =========================
+  // ADD BOOK DIALOG
+  // =========================
+
+  private void showAddBookDialog() {
+
+    JTextField idField = new JTextField();
+
+    JTextField titleField = new JTextField();
+
+    JTextField authorField = new JTextField();
+
+    JTextField categoryField = new JTextField();
+
+    JTextField isbnField = new JTextField();
+
+    JTextField quantityField = new JTextField();
+
+    JPanel panel = new JPanel(
+        new GridLayout(6, 2, 10, 10));
+
+    panel.add(new JLabel("Book ID:"));
+    panel.add(idField);
+
+    panel.add(new JLabel("Title:"));
+    panel.add(titleField);
+
+    panel.add(new JLabel("Author:"));
+    panel.add(authorField);
+
+    panel.add(new JLabel("Category:"));
+    panel.add(categoryField);
+
+    panel.add(new JLabel("ISBN:"));
+    panel.add(isbnField);
+
+    panel.add(new JLabel("Quantity:"));
+    panel.add(quantityField);
+
+    int result = JOptionPane.showConfirmDialog(
+        this,
+        panel,
+        "Add New Book",
+        JOptionPane.OK_CANCEL_OPTION);
+
+    if (result == JOptionPane.OK_OPTION) {
+
+      try {
+
+        int id = Integer.parseInt(
+            idField.getText());
+
+        int quantity = Integer.parseInt(
+            quantityField.getText());
+
+        Book book = new Book(
+            id,
+            titleField.getText(),
+            authorField.getText(),
+            categoryField.getText(),
+            isbnField.getText(),
+            quantity);
+
+        library.addBook(book);
+
+        loadBooks();
+
+        JOptionPane.showMessageDialog(
+            this,
+            "Book added successfully!");
+
+      } catch (NumberFormatException ex) {
+
+        JOptionPane.showMessageDialog(
+            this,
+            "Book ID and Quantity must be numbers.",
+            "Invalid Input",
+            JOptionPane.ERROR_MESSAGE);
+      }
+    }
   }
 }
