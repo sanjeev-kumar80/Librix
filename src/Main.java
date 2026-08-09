@@ -141,6 +141,30 @@ public class Main {
 
     library.showAllBooks();
 
+    System.out.println("\n--- SEARCH BOOK ---");
+
+    try {
+
+      Book foundBook = library.searchBook(101);
+
+      System.out.println(
+          "Book Found: " + foundBook.getTitle());
+
+      System.out.println(
+          "Author: " + foundBook.getAuthor());
+
+      System.out.println(
+          "Category: " + foundBook.getCategory());
+
+      System.out.println(
+          "Quantity: " + foundBook.getQuantity());
+
+    } catch (BookNotFoundException e) {
+
+      System.out.println(
+          "ERROR: " + e.getMessage());
+    }
+
     // =========================
     // EXCEPTION TEST
     // =========================
