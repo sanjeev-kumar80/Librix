@@ -2,184 +2,211 @@ import model.*;
 import service.LibraryService;
 import exception.*;
 
+import java.util.Scanner;
+
 public class Main {
 
   public static void main(String[] args) {
 
     LibraryService library = new LibraryService();
 
+    Scanner sc = new Scanner(System.in);
+
     // =========================
-    // BOOKS
+    // DEFAULT BOOKS
     // =========================
 
-    Book book1 = new Book(
+    library.addBook(new Book(
         101,
         "Clean Code",
         "Robert Martin",
         "Programming",
         "9780132350884",
-        3);
+        3));
 
-    Book book2 = new Book(
+    library.addBook(new Book(
         102,
         "Effective Java",
         "Joshua Bloch",
         "Programming",
         "9780134685991",
-        2);
+        2));
 
     // =========================
-    // USERS
+    // DEFAULT USERS
     // =========================
 
-    User student = new Student(
-        1,
-        "Rahul",
-        "rahul@gmail.com");
+    library.addUser(
+        new Student(
+            1,
+            "Rahul",
+            "rahul@gmail.com"));
 
-    User teacher = new Teacher(
-        2,
-        "Amit",
-        "amit@gmail.com");
+    library.addUser(
+        new Teacher(
+            2,
+            "Amit",
+            "amit@gmail.com"));
 
-    User special = new SpecialMember(
-        3,
-        "Dr. Sharma",
-        "sharma@gmail.com");
-
-    // =========================
-    // ADD BOOKS
-    // =========================
-
-    library.addBook(book1);
-    library.addBook(book2);
+    library.addUser(
+        new SpecialMember(
+            3,
+            "Dr. Sharma",
+            "sharma@gmail.com"));
 
     // =========================
-    // ADD USERS
+    // MENU
     // =========================
 
-    library.addUser(student);
-    library.addUser(teacher);
-    library.addUser(special);
+    while (true) {
 
-    // =========================
-    // SHOW ALL BOOKS
-    // =========================
+      System.out.println("\n============================");
+      System.out.println("          LIBRIX");
+      System.out.println("============================");
+      System.out.println("1. Show All Books");
+      System.out.println("2. Search Book");
+      System.out.println("3. Issue Book");
+      System.out.println("4. Return Book");
+      System.out.println("5. Show Issued Books");
+      System.out.println("6. Exit");
+      System.out.println("============================");
 
-    System.out.println("\n--- ALL BOOKS ---");
+      System.out.print("Enter your choice: ");
 
-    library.showAllBooks();
+      if (!sc.hasNextInt()) {
+        System.out.println("Invalid input! Please enter a number.");
+        break;
+      }
 
-    // =========================
-    // STUDENT TEST
-    // =========================
+      int choice = sc.nextInt();
 
-    System.out.println("\n--- STUDENT TEST ---");
+      switch (choice) {
 
-    try {
+        case 1:
 
-      library.issueBook(1, 101, 1);
+          System.out.println("\n--- ALL BOOKS ---");
 
-      library.makeBookOverdue(1, 5);
+          library.showAllBooks();
 
-      library.returnBook(1);
+          break;
 
-    } catch (
-        BookNotFoundException | UserNotFoundException | BookNotAvailableException | BookAlreadyReturnedException e) {
+        case 2:
 
-      System.out.println(
-          "ERROR: " + e.getMessage());
-    }
+          System.out.print(
+              "Enter Book ID: ");
 
-    // =========================
-    // TEACHER TEST
-    // =========================
+          int searchId = sc.nextInt();
 
-    System.out.println("\n--- TEACHER TEST ---");
+          try {
 
-    try {
+            Book book = library.searchBook(searchId);
 
-      library.issueBook(2, 102, 2);
+            System.out.println(
+                "\nBook Found!");
 
-      library.makeBookOverdue(2, 5);
+            System.out.println(
+                "Title: "
+                    + book.getTitle());
 
-      library.returnBook(2);
+            System.out.println(
+                "Author: "
+                    + book.getAuthor());
 
-    } catch (
-        BookNotFoundException | UserNotFoundException | BookNotAvailableException | BookAlreadyReturnedException e) {
+            System.out.println(
+                "Category: "
+                    + book.getCategory());
 
-      System.out.println(
-          "ERROR: " + e.getMessage());
-    }
+            System.out.println(
+                "Quantity: "
+                    + book.getQuantity());
 
-    // =========================
-    // SPECIAL MEMBER TEST
-    // =========================
+          } catch (BookNotFoundException e) {
 
-    System.out.println("\n--- SPECIAL MEMBER TEST ---");
+            System.out.println(
+                "ERROR: "
+                    + e.getMessage());
+          }
 
-    try {
+          break;
 
-      library.issueBook(3, 101, 3);
+        case 3:
 
-      library.makeBookOverdue(3, 5);
+          System.out.print(
+              "Enter Record ID: ");
 
-      library.returnBook(3);
+          int recordId = sc.nextInt();
 
-    } catch (
-        BookNotFoundException | UserNotFoundException | BookNotAvailableException | BookAlreadyReturnedException e) {
+          System.out.print(
+              "Enter Book ID: ");
 
-      System.out.println(
-          "ERROR: " + e.getMessage());
-    }
+          int bookId = sc.nextInt();
 
-    // =========================
-    // SHOW BOOKS
-    // =========================
+          System.out.print(
+              "Enter User ID: ");
 
-    System.out.println("\n--- BOOKS AFTER TESTING ---");
+          int userId = sc.nextInt();
 
-    library.showAllBooks();
+          try {
 
-    System.out.println("\n--- SEARCH BOOK ---");
+            library.issueBook(
+                recordId,
+                bookId,
+                userId);
 
-    try {
+          } catch (
+              BookNotFoundException | UserNotFoundException | BookNotAvailableException e) {
 
-      Book foundBook = library.searchBook(101);
+            System.out.println(
+                "ERROR: "
+                    + e.getMessage());
+          }
 
-      System.out.println(
-          "Book Found: " + foundBook.getTitle());
+          break;
 
-      System.out.println(
-          "Author: " + foundBook.getAuthor());
+        case 4:
 
-      System.out.println(
-          "Category: " + foundBook.getCategory());
+          System.out.print(
+              "Enter Record ID: ");
 
-      System.out.println(
-          "Quantity: " + foundBook.getQuantity());
+          int returnRecordId = sc.nextInt();
 
-    } catch (BookNotFoundException e) {
+          try {
 
-      System.out.println(
-          "ERROR: " + e.getMessage());
-    }
+            library.returnBook(
+                returnRecordId);
 
-    // =========================
-    // EXCEPTION TEST
-    // =========================
+          } catch (BookAlreadyReturnedException e) {
 
-    System.out.println("\n--- EXCEPTION TEST ---");
+            System.out.println(
+                "ERROR: "
+                    + e.getMessage());
+          }
 
-    try {
+          break;
 
-      library.issueBook(4, 999, 1);
+        case 5:
 
-    } catch (
-        BookNotFoundException | UserNotFoundException | BookNotAvailableException e) {
+          System.out.println(
+              "\n--- ISSUED BOOKS ---");
 
-      System.out.println(
-          "ERROR: " + e.getMessage());
+          library.showIssuedBooks();
+
+          break;
+
+        case 6:
+
+          System.out.println(
+              "\nThank you for using LIBRIX!");
+
+          sc.close();
+
+          return;
+
+        default:
+
+          System.out.println(
+              "Invalid choice!");
+      }
     }
   }
 }
