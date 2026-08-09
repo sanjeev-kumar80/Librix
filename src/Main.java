@@ -1,5 +1,6 @@
 import model.*;
 import service.LibraryService;
+import exception.*;
 
 public class Main {
 
@@ -7,7 +8,10 @@ public class Main {
 
     LibraryService library = new LibraryService();
 
-    // Books
+    // =========================
+    // BOOKS
+    // =========================
+
     Book book1 = new Book(
         101,
         "Clean Code",
@@ -24,57 +28,134 @@ public class Main {
         "9780134685991",
         2);
 
-    // Users
-    User student = new Student(1, "Rahul", "rahul@gmail.com");
+    // =========================
+    // USERS
+    // =========================
 
-    User teacher = new Teacher(2, "Amit", "amit@gmail.com");
+    User student = new Student(
+        1,
+        "Rahul",
+        "rahul@gmail.com");
 
-    User special = new SpecialMember(3, "Dr. Sharma", "sharma@gmail.com");
+    User teacher = new Teacher(
+        2,
+        "Amit",
+        "amit@gmail.com");
 
-    // Add books
+    User special = new SpecialMember(
+        3,
+        "Dr. Sharma",
+        "sharma@gmail.com");
+
+    // =========================
+    // ADD BOOKS
+    // =========================
+
     library.addBook(book1);
     library.addBook(book2);
 
-    // Add users
+    // =========================
+    // ADD USERS
+    // =========================
+
     library.addUser(student);
     library.addUser(teacher);
     library.addUser(special);
+
+    // =========================
+    // SHOW ALL BOOKS
+    // =========================
 
     System.out.println("\n--- ALL BOOKS ---");
 
     library.showAllBooks();
 
-    System.out.println("\n--- ISSUE BOOK ---");
+    // =========================
+    // STUDENT TEST
+    // =========================
 
-    library.issueBook(1, 101, 1);
+    System.out.println("\n--- STUDENT TEST ---");
 
-    System.out.println("\n--- MAKE BOOK OVERDUE ---");
+    try {
 
-    library.makeBookOverdue(1, 5);
+      library.issueBook(1, 101, 1);
 
-    System.out.println("\n--- RETURN BOOK ---");
+      library.makeBookOverdue(1, 5);
 
-    library.returnBook(1);
+      library.returnBook(1);
 
-    System.out.println("\n--- BOOKS AFTER RETURN ---");
+    } catch (
+        BookNotFoundException | UserNotFoundException | BookNotAvailableException | BookAlreadyReturnedException e) {
 
-    library.showAllBooks();
+      System.out.println(
+          "ERROR: " + e.getMessage());
+    }
+
+    // =========================
+    // TEACHER TEST
+    // =========================
 
     System.out.println("\n--- TEACHER TEST ---");
 
-    library.issueBook(2, 102, 2);
+    try {
 
-    library.makeBookOverdue(2, 5);
+      library.issueBook(2, 102, 2);
 
-    library.returnBook(2);
+      library.makeBookOverdue(2, 5);
+
+      library.returnBook(2);
+
+    } catch (
+        BookNotFoundException | UserNotFoundException | BookNotAvailableException | BookAlreadyReturnedException e) {
+
+      System.out.println(
+          "ERROR: " + e.getMessage());
+    }
+
+    // =========================
+    // SPECIAL MEMBER TEST
+    // =========================
 
     System.out.println("\n--- SPECIAL MEMBER TEST ---");
 
-    library.issueBook(3, 101, 3);
+    try {
 
-    library.makeBookOverdue(3, 5);
+      library.issueBook(3, 101, 3);
 
-    library.returnBook(3);
+      library.makeBookOverdue(3, 5);
 
+      library.returnBook(3);
+
+    } catch (
+        BookNotFoundException | UserNotFoundException | BookNotAvailableException | BookAlreadyReturnedException e) {
+
+      System.out.println(
+          "ERROR: " + e.getMessage());
+    }
+
+    // =========================
+    // SHOW BOOKS
+    // =========================
+
+    System.out.println("\n--- BOOKS AFTER TESTING ---");
+
+    library.showAllBooks();
+
+    // =========================
+    // EXCEPTION TEST
+    // =========================
+
+    System.out.println("\n--- EXCEPTION TEST ---");
+
+    try {
+
+      library.issueBook(4, 999, 1);
+
+    } catch (
+        BookNotFoundException | UserNotFoundException | BookNotAvailableException e) {
+
+      System.out.println(
+          "ERROR: " + e.getMessage());
+    }
   }
 }

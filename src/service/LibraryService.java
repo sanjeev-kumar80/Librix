@@ -4,6 +4,11 @@ import model.Book;
 import model.User;
 import model.IssueRecord;
 
+import exception.BookNotAvailableException;
+import exception.BookNotFoundException;
+import exception.UserNotFoundException;
+import exception.BookAlreadyReturnedException;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +31,7 @@ public class LibraryService {
     System.out.println("User added successfully!");
   }
 
-  // Show all books
+  // Show All Books
   public void showAllBooks() {
 
     if (books.isEmpty()) {
@@ -45,42 +50,59 @@ public class LibraryService {
   }
 
   // Search Book
-  public Book searchBook(int bookId) {
+  public Book searchBook(int bookId)
+      throws BookNotFoundException {
 
     for (Book book : books) {
+
       if (book.getBookId() == bookId) {
         return book;
       }
     }
 
-    return null;
+    throw new BookNotFoundException(
+        "Book with ID " + bookId + " not found!");
+  }
+
+  // Find User
+  private User findUser(int userId)
+      throws UserNotFoundException {
+
+    for (User user : users) {
+
+      if (user.getUserId() == userId) {
+        return user;
+      }
+    }
+
+    throw new UserNotFoundException(
+        "User with ID " + userId + " not found!");
   }
 
   // Issue Book
-  public void issueBook(int recordId, int bookId, int userId) {
+  public void issueBook(
+      int recordId,
+      int bookId,
+      int userId)
+      throws BookNotFoundException,
+      UserNotFoundException,
+      BookNotAvailableException {
 
     Book book = searchBook(bookId);
 
-    if (book == null) {
-      System.out.println("Book not found!");
-      return;
-    }
-
     User user = findUser(userId);
 
-    if (user == null) {
-      System.out.println("User not found!");
-      return;
-    }
-
     if (!book.isAvailable()) {
-      System.out.println("Book is not available!");
-      return;
+
+      throw new BookNotAvailableException(
+          "Book '" + book.getTitle()
+              + "' is currently unavailable!");
     }
 
     book.setQuantity(book.getQuantity() - 1);
 
     LocalDate issueDate = LocalDate.now();
+
     LocalDate dueDate = issueDate.plusDays(14);
 
     IssueRecord record = new IssueRecord(
@@ -96,25 +118,14 @@ public class LibraryService {
     System.out.println("Due Date: " + dueDate);
   }
 
-  // Find User
-  private User findUser(int userId) {
-
-    for (User user : users) {
-      if (user.getUserId() == userId) {
-        return user;
-      }
-    }
-
-    return null;
-  }
-
   // Return Book
-  public void returnBook(int recordId) {
+  public void returnBook(int recordId)
+      throws BookAlreadyReturnedException {
 
     IssueRecord record = null;
 
-    // Find issue record
     for (IssueRecord r : issueRecords) {
+
       if (r.getRecordId() == recordId) {
         record = r;
         break;
@@ -126,31 +137,29 @@ public class LibraryService {
       return;
     }
 
-    // Check if already returned
     if (record.getReturnDate() != null) {
-      System.out.println("Book has already been returned!");
-      return;
+
+      throw new BookAlreadyReturnedException(
+          "Book has already been returned!");
     }
 
     LocalDate returnDate = LocalDate.now();
 
     record.setReturnDate(returnDate);
 
-    // Calculate late days
     long lateDays = 0;
 
     if (returnDate.isAfter(record.getDueDate())) {
+
       lateDays = java.time.temporal.ChronoUnit.DAYS.between(
           record.getDueDate(),
           returnDate);
     }
 
-    // Calculate fine
     double fine = lateDays * record.getUser().getFinePerDay();
 
     record.setFine(fine);
 
-    // Increase book quantity
     Book book = record.getBook();
 
     book.setQuantity(book.getQuantity() + 1);
@@ -161,7 +170,10 @@ public class LibraryService {
     System.out.println("Fine: ₹" + fine);
   }
 
-  public void makeBookOverdue(int recordId, int daysLate) {
+  // Make Book Overdue - Testing Only
+  public void makeBookOverdue(
+      int recordId,
+      int daysLate) {
 
     for (IssueRecord record : issueRecords) {
 
@@ -182,20 +194,24 @@ public class LibraryService {
     System.out.println("Issue record not found!");
   }
 
-  // Show issued books
+  // Show Issued Books
   public void showIssuedBooks() {
 
     if (issueRecords.isEmpty()) {
-      System.out.println("No books are currently issued.");
+      System.out.println(
+          "No books are currently issued.");
       return;
     }
 
     for (IssueRecord record : issueRecords) {
 
       System.out.println(
-          "Book: " + record.getBook().getTitle() +
-              " | User: " + record.getUser().getName() +
-              " | Due Date: " + record.getDueDate());
+          "Book: "
+              + record.getBook().getTitle()
+              + " | User: "
+              + record.getUser().getName()
+              + " | Due Date: "
+              + record.getDueDate());
     }
   }
 }
