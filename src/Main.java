@@ -55,5 +55,21 @@ public class Main {
     System.out.println("\n--- BOOKS AFTER ISSUE ---");
 
     library.showAllBooks();
+
+    System.out.println("\n--- ISSUE BOOK ---");
+
+    library.issueBook(1, 101, 1);
+
+    System.out.println("\n--- ISSUED BOOKS ---");
+
+    library.showIssuedBooks();
+
+    System.out.println("\n--- RETURN BOOK ---");
+
+    library.returnBook(1);
+
+    System.out.println("\n--- BOOKS AFTER RETURN ---");
+
+    library.showAllBooks();
   }
 }

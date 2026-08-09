@@ -108,6 +108,59 @@ public class LibraryService {
     return null;
   }
 
+  // Return Book
+  public void returnBook(int recordId) {
+
+    IssueRecord record = null;
+
+    // Find issue record
+    for (IssueRecord r : issueRecords) {
+      if (r.getRecordId() == recordId) {
+        record = r;
+        break;
+      }
+    }
+
+    if (record == null) {
+      System.out.println("Issue record not found!");
+      return;
+    }
+
+    // Check if already returned
+    if (record.getReturnDate() != null) {
+      System.out.println("Book has already been returned!");
+      return;
+    }
+
+    LocalDate returnDate = LocalDate.now();
+
+    record.setReturnDate(returnDate);
+
+    // Calculate late days
+    long lateDays = 0;
+
+    if (returnDate.isAfter(record.getDueDate())) {
+      lateDays = java.time.temporal.ChronoUnit.DAYS.between(
+          record.getDueDate(),
+          returnDate);
+    }
+
+    // Calculate fine
+    double fine = lateDays * record.getUser().getFinePerDay();
+
+    record.setFine(fine);
+
+    // Increase book quantity
+    Book book = record.getBook();
+
+    book.setQuantity(book.getQuantity() + 1);
+
+    System.out.println("Book returned successfully!");
+    System.out.println("Return Date: " + returnDate);
+    System.out.println("Late Days: " + lateDays);
+    System.out.println("Fine: ₹" + fine);
+  }
+
   // Show issued books
   public void showIssuedBooks() {
 
